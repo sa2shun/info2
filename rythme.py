@@ -14,14 +14,14 @@ class Note:
 
 
 class ListNote():
-    def __init__(self):
+    def __init__(self, num_of_notes):
         self.notes = []
-        self.making_initialze_notes()
+        self.making_initialze_notes(num_of_notes)
         self.scope = 0
         for i in range(0, 5):
             self.notes[i].y = -30 * i - i * random.randint(0, 20)
-    def making_initialze_notes(self):
-        for i in range(150):
+    def making_initialze_notes(self,num_of_notes):
+        for i in range(num_of_notes):
             self.notes.append(Note())
 
     def update_notes(self):
@@ -35,23 +35,33 @@ class ListNote():
 class App:
     def __init__(self):
         pyxel.init(200, 200)
+        self.num_of_notes = 30
         self.score = 0
         self.combo = 0
         self.max_combo = 0
-        self.notes = ListNote()
+        self.notes = ListNote(self.num_of_notes)
         self.is_start = False
         self.is_end = False
+        self.level = 2
+        self.text_color = 7
         pyxel.run(self.update, self.draw)
 
     def update(self):
         if not self.is_start:
             if pyxel.btnp(pyxel.KEY_SPACE):
                 self.is_start = True
-
+            if pyxel.btn(pyxel.KEY_1):
+                self.level = 1
+            if pyxel.btn(pyxel.KEY_2):
+                self.level = 2
+            if pyxel.btn(pyxel.KEY_3):
+                self.level = 3
+            for note in self.notes.notes:
+                note.speed = self.level
         else:
             if self.is_end:
                 return
-            elif self.notes.scope >= 145:
+            elif self.notes.scope >= self.num_of_notes - 5:
                 self.is_end = True
             self.notes.update_notes()
             self.notes.scope = self.notes.scope
@@ -86,34 +96,34 @@ class App:
                     self.combo = 0
 
     def draw(self):
-        pyxel.cls(7)
+        pyxel.cls(0)
 
         if not self.is_start:
-            pyxel.text(50, 50, 'Rythme Game', 0)
-            pyxel.text(50, 70, 'Press Space', 0)
+            pyxel.text(50, 50, 'Rythme Game', self.text_color)
+            pyxel.text(50, 70, 'Press Space', self.text_color)
+            pyxel.text(50, 90, f'Level:{self.level}', self.text_color)
         else:
             if self.is_end:
 
-                pyxel.text(50, 50, 'Finished!', 0)
-                pyxel.text(50, 70, f'SCORE:{self.score}' ,0)
-                pyxel.text(50,90, f'COMBO BONUS!:+{self.max_combo}' ,0)
-                pyxel.text(50, 110, f'Final Score:{self.score+self.max_combo}', 0)
+                pyxel.text(50, 50, 'Finished!', self.text_color)
+                pyxel.text(50, 70, f'SCORE:{self.score}' ,self.text_color)
+                pyxel.text(50,90, f'COMBO BONUS!:+{self.max_combo}' ,self.text_color)
+                pyxel.text(50, 110, f'Final Score:{self.score+self.max_combo}', self.text_color)
                 return
-            pyxel.line(0, 185, 200, 185, 0)
-            pyxel.line(0, 192, 200, 192, 0)
+            pyxel.line(0, 185, 200, 185, self.text_color)
+            pyxel.line(0, 192, 200, 192, self.text_color)
 
             for i in range(0, self.notes.scope + 5):
                 note = self.notes.notes[i]
                 if note.y <= 200:
                     pyxel.circ(note.x, note.y, 5, note.color)
-                    pyxel.text(note.x, note.y, note.key, 0)
+                    pyxel.text(note.x, note.y, note.key, self.text_color)
                     if note.point != -1:
                         score = ['Bad', 'Good', 'Perfect'][note.point]
-                        pyxel.text(note.x+10, note.y, score, 0)
-            pyxel.text(10, 10, f'SCORE:{str(self.score)}', 0)
-            pyxel.text(10, 20, f'COMBO:{str(self.combo)}', 0)
-            pyxel.text(10, 30, f'MAX_COMBO:{str(self.max_combo)}', 0)
+                        pyxel.text(note.x+10, note.y, score, self.text_color)
+            pyxel.text(10, 10, f'SCORE:{str(self.score)}', self.text_color)
+            pyxel.text(10, 20, f'COMBO:{str(self.combo)}', self.text_color)
+            pyxel.text(10, 30, f'MAX_COMBO:{str(self.max_combo)}', self.text_color)
 
-            pyxel.text(10, 40, f'{self.notes.scope}', 0)
 
 App()
